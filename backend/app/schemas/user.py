@@ -1,11 +1,15 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict,EmailStr,Field
+from pydantic import BaseModel, ConfigDict,EmailStr,Field, field_validator
 import uuid
 
 # Registering the User
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v):
+        return v.strip().lower() if isinstance(v, str) else v
 
 
 class UserOut(BaseModel):
@@ -18,6 +22,11 @@ class UserOut(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8)
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, v):
+        return v.strip().lower() if isinstance(v, str) else v
+
 
 class RefreshRequest(BaseModel):
     refresh_token: str
@@ -27,5 +36,5 @@ class TokenPair(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
 
-    
+
 
